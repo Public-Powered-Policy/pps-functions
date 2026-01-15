@@ -1,16 +1,29 @@
+import querystring from "querystring";
+
 export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const apiKey = process.env.STATICFORMS_KEY;
-  const formData = JSON.parse(event.body);
+  // Parse form-encoded body
+  const data = querystring.parse(event.body);
 
+  const { name, email, message, honeypot } = data;
+
+  // Honeypot check
+  if (honeypot) {
+    return { statusCode: 200, body: "OK" };
+  }
+
+  // Build payload for StaticForms
   const payload = {
-    ...formData,
-    accessKey: apiKey
+    accessKey: process.env.STATICFORMS_KEY,
+    name,
+    email,
+    message
   };
 
+  // Forward to StaticForms
   const response = await fetch("https://api.staticforms.xyz/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -20,7 +33,7 @@ export async function handler(event) {
   const result = await response.json();
 
   return {
-    statusCode: response.status,
+    statusCode: 200,
     body: JSON.stringify(result)
   };
 }
