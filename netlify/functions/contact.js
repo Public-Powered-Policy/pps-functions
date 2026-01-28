@@ -35,7 +35,7 @@ export async function handler(event) {
   return {
     statusCode: 302,
     headers: {
-      Location: "https://public-powered-policy.github.io/public-powered-policy/thank-you/"
+      Location: "https://publicpoweredpolicy.com/thank-you/"
     }
   };
 }
